@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bundle install
+
+echo "Run the Rails install generators once Ruby is available:"
+echo "  bin/rails active_storage:install"
+echo "  bin/rails solid_queue:install:migrations"
+echo "  bin/rails mission_control:jobs:install"
+echo "  bin/rails db:prepare"
+

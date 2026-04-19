@@ -9,6 +9,7 @@ node_modules/
 .next/
 dist/
 build/
+*.tsbuildinfo
 vendor/bundle/
 .bundle/
 *.sqlite3
@@ -23,4 +24,3 @@ apps/api/public/assets/
 apps/api/public/packs/
 apps/web/.turbo/
 apps/web/.vercel/
-
