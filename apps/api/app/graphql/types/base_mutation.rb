@@ -14,6 +14,10 @@ module Types
     def current_organization
       context[:current_organization]
     end
+
+    def authorize_record!(record, query)
+      policy = Pundit.policy!(Auth::SessionContext.new(user: current_user, organization: current_organization), record)
+      raise Pundit::NotAuthorizedError, "Not authorized to #{query} #{record}" unless policy.public_send(query)
+    end
   end
 end
-
