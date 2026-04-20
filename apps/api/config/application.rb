@@ -17,7 +17,7 @@ module BookkeeperAgentApi
     config.api_only = true
     config.time_zone = "UTC"
     config.active_job.queue_adapter = :solid_queue
-    config.active_record.schema_format = :sql
+    config.active_record.schema_format = :ruby
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
       g.test_framework :rspec, fixture: false

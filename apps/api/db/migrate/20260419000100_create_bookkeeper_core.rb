@@ -136,7 +136,7 @@ class CreateBookkeeperCore < ActiveRecord::Migration[8.0]
 
     create_table :review_queue_items, id: :uuid do |t|
       t.references :organization, null: false, type: :uuid, foreign_key: true
-      t.references :receipt, null: false, type: :uuid, foreign_key: true
+      t.references :receipt, null: false, type: :uuid, foreign_key: true, index: false
       t.references :assigned_to, type: :uuid, foreign_key: { to_table: :users }
       t.string :state, null: false, default: "pending"
       t.integer :priority, null: false, default: 50
@@ -158,7 +158,7 @@ class CreateBookkeeperCore < ActiveRecord::Migration[8.0]
 
     create_table :accounting_entries, id: :uuid do |t|
       t.references :organization, null: false, type: :uuid, foreign_key: true
-      t.references :receipt, null: false, type: :uuid, foreign_key: true
+      t.references :receipt, null: false, type: :uuid, foreign_key: true, index: false
       t.string :status, null: false, default: "draft"
       t.date :transaction_date, null: false
       t.string :currency, null: false
@@ -202,6 +202,125 @@ class CreateBookkeeperCore < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :audit_events, %i[auditable_type auditable_id]
+
+    # ── Active Storage ──────────────────────────────────────
+    create_table :active_storage_blobs, id: :primary_key do |t|
+      t.string   :key,          null: false
+      t.string   :filename,     null: false
+      t.string   :content_type
+      t.text     :metadata
+      t.string   :service_name, null: false
+      t.bigint   :byte_size,    null: false
+      t.string   :checksum
+      t.datetime :created_at,   null: false
+    end
+    add_index :active_storage_blobs, [:key], unique: true
+
+    create_table :active_storage_attachments, id: :primary_key do |t|
+      t.string     :name,     null: false
+      t.references :record,   null: false, polymorphic: true, index: false, type: :uuid
+      t.references :blob,     null: false, type: :bigint
+      t.datetime   :created_at, null: false
+    end
+    add_index :active_storage_attachments, [:record_type, :record_id, :name, :blob_id],
+              name: "index_active_storage_attachments_uniqueness", unique: true
+    add_foreign_key :active_storage_attachments, :active_storage_blobs, column: :blob_id
+
+    create_table :active_storage_variant_records, id: :primary_key do |t|
+      t.belongs_to :blob, null: false, index: false, type: :bigint
+      t.string :variation_digest, null: false
+    end
+    add_index :active_storage_variant_records, [:blob_id, :variation_digest],
+              name: "index_active_storage_variant_records_uniqueness", unique: true
+    add_foreign_key :active_storage_variant_records, :active_storage_blobs, column: :blob_id
+
+    # ── Solid Queue ─────────────────────────────────────────
+    create_table :solid_queue_jobs do |t|
+      t.string   :queue_name,   null: false
+      t.string   :class_name,   null: false, index: true
+      t.text     :arguments
+      t.integer  :priority,     null: false, default: 0
+      t.string   :active_job_id, index: true
+      t.datetime :scheduled_at
+      t.datetime :finished_at,  index: true
+      t.string   :concurrency_key
+      t.timestamps
+    end
+    add_index :solid_queue_jobs, [:queue_name, :finished_at]
+    add_index :solid_queue_jobs, [:scheduled_at, :finished_at]
+
+    create_table :solid_queue_scheduled_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.string   :queue_name, null: false
+      t.integer  :priority,   null: false, default: 0
+      t.datetime :scheduled_at, null: false
+      t.datetime :created_at,   null: false
+    end
+    add_index :solid_queue_scheduled_executions, [:scheduled_at, :priority, :job_id],
+              name: "index_solid_queue_dispatch_all"
+
+    create_table :solid_queue_ready_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.string   :queue_name, null: false
+      t.integer  :priority,   null: false, default: 0
+      t.datetime :created_at, null: false
+    end
+    add_index :solid_queue_ready_executions, [:priority, :job_id],
+              name: "index_solid_queue_poll_all"
+    add_index :solid_queue_ready_executions, [:queue_name, :priority, :job_id],
+              name: "index_solid_queue_poll_by_queue"
+
+    create_table :solid_queue_claimed_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.bigint   :process_id, index: true
+      t.datetime :created_at, null: false
+    end
+
+    create_table :solid_queue_blocked_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.string   :queue_name, null: false
+      t.integer  :priority,   null: false, default: 0
+      t.string   :concurrency_key, null: false, index: true
+      t.datetime :expires_at,  null: false
+      t.datetime :created_at,  null: false
+    end
+
+    create_table :solid_queue_failed_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.text     :error
+      t.datetime :created_at, null: false
+    end
+
+    create_table :solid_queue_pauses do |t|
+      t.string   :queue_name, null: false, index: { unique: true }
+      t.datetime :created_at, null: false
+    end
+
+    create_table :solid_queue_processes do |t|
+      t.string   :kind,       null: false
+      t.datetime :last_heartbeat_at, null: false, index: true
+      t.bigint   :supervisor_id, index: true
+      t.integer  :pid,        null: false
+      t.string   :hostname
+      t.text     :metadata
+      t.datetime :created_at, null: false
+      t.string   :name, index: { unique: true }
+    end
+
+    create_table :solid_queue_semaphores do |t|
+      t.string   :key,        null: false, index: { unique: true }
+      t.integer  :value,      null: false, default: 1
+      t.datetime :expires_at, null: false, index: true
+      t.timestamps
+    end
+
+    create_table :solid_queue_recurring_executions do |t|
+      t.references :job, null: false, index: { unique: true }, foreign_key: { to_table: :solid_queue_jobs }
+      t.string   :task_key,   null: false
+      t.datetime :run_at,     null: false
+      t.datetime :created_at, null: false
+    end
+    add_index :solid_queue_recurring_executions, [:task_key, :run_at], unique: true
   end
 end
 

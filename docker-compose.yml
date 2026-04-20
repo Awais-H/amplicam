@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bookkeeper
+      POSTGRES_PASSWORD: bookkeeper
+      POSTGRES_DB: bookkeeper_agent_development
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: ./apps/api
+    command: bash -c "bundle install && bundle exec rake db:migrate db:seed && bundle exec puma -b tcp://0.0.0.0:3000"
+    ports:
+      - "3100:3000"
+    environment:
+      DATABASE_URL: postgres://bookkeeper:bookkeeper@db:5432/bookkeeper_agent_development
+      RAILS_ENV: development
+      SECRET_KEY_BASE: dev-secret-key-for-local-use-only
+      JWT_SECRET_KEY: dev-secret-key-for-local-use-only
+      RAILS_PUBLIC_URL: http://localhost:3100
+      FRONTEND_URL: http://localhost:3000
+      # Must match Google Cloud "Authorized redirect URIs": http://localhost:3100/auth/google_oauth2/callback
+      APP_HOST: http://localhost:3100
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      # Set in a .env file next to this compose file (Compose loads .env for ${VAR} substitution).
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    depends_on:
+      - db
+    volumes:
+      - ./apps/api:/app
+
+  worker:
+    build: ./apps/api
+    command: bash -c "sleep 30 && bundle install && bundle exec rake solid_queue:start"
+    environment:
+      DATABASE_URL: postgres://bookkeeper:bookkeeper@db:5432/bookkeeper_agent_development
+      RAILS_ENV: development
+      SECRET_KEY_BASE: dev-secret-key-for-local-use-only
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      - api
+    volumes:
+      - ./apps/api:/app
+
+volumes:
+  pgdata:
