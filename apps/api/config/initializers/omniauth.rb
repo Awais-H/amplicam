@@ -11,7 +11,7 @@ oidc_ready = ENV["OIDC_ISSUER"].present? && ENV["OIDC_CLIENT_ID"].present? && EN
 if google_ready || oidc_ready
   # Public origin of this API (no trailing slash). Must match Google Cloud "Authorized redirect URIs"
   # host, e.g. APP_HOST=http://localhost:3100 → redirect URI .../auth/google_oauth2/callback
-  app_origin = ENV.fetch("APP_HOST", "http://localhost:3100").sub(%r{/+\z}, "")
+  app_origin = ENV.fetch("APP_HOST").sub(%r{/+\z}, "")
   OmniAuth.config.full_host = app_origin
 
   Rails.application.config.middleware.use OmniAuth::Builder do
@@ -38,7 +38,7 @@ if google_ready || oidc_ready
         client_options: {
           identifier: ENV.fetch("OIDC_CLIENT_ID"),
           secret: ENV.fetch("OIDC_CLIENT_SECRET"),
-          redirect_uri: "#{ENV.fetch('APP_HOST', 'http://localhost:3100')}/auth/oidc/callback"
+          redirect_uri: "#{ENV.fetch('APP_HOST')}/auth/oidc/callback"
         }
       )
     end

@@ -9,7 +9,7 @@ module Auth
           expires_in: Auth::JsonWebToken.expiry_seconds.to_s
         }
       )
-      frontend = ENV.fetch("FRONTEND_URL", "http://localhost:3000")
+      frontend = ENV.fetch("FRONTEND_URL")
       redirect_to "#{frontend}/login##{fragment}", allow_other_host: true
     rescue ArgumentError => e
       failure_redirect(e.message)
@@ -22,7 +22,7 @@ module Auth
     private
 
     def failure_redirect(message)
-      frontend = ENV.fetch("FRONTEND_URL", "http://localhost:3000")
+      frontend = ENV.fetch("FRONTEND_URL")
       q = Rack::Utils.build_query({ auth_error: message })
       redirect_to "#{frontend}/login?#{q}", allow_other_host: true
     end
