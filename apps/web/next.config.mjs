@@ -20,6 +20,12 @@ const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: monorepoRoot,
   async rewrites() {
+    if (process.env.VERCEL === "1" && !process.env.API_URL?.trim()) {
+      throw new Error(
+        "API_URL is unset. Vercel cannot proxy /graphql or /auth/* without your Rails API origin. " +
+          "Add API_URL in Vercel → Settings → Environment Variables (e.g. https://your-service.up.railway.app), then redeploy."
+      );
+    }
     const apiOrigin = normalizeApiOrigin(process.env.API_URL);
     return [
       {
