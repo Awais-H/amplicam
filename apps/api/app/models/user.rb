@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_secure_password validations: false
+
   has_many :memberships, dependent: :destroy
   has_many :organizations, through: :memberships
   has_many :oauth_identities, dependent: :destroy
@@ -8,5 +10,8 @@ class User < ApplicationRecord
 
   validates :email, :display_name, presence: true
   validates :email, uniqueness: true
+  validates :password, presence: true, length: { minimum: 8 }, if: -> { registering_with_password }
+
+  attr_accessor :registering_with_password
 end
 
