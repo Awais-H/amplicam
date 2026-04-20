@@ -7,7 +7,10 @@ export const metadata: Metadata = {
     default: "Bookkeeper",
     template: "%s · Bookkeeper"
   },
-  description: "Receipt intake, extraction, and review for your books."
+  description: "Receipt intake, extraction, and review for your books.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }]
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

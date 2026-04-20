@@ -29,6 +29,10 @@ const nextConfig = {
     const apiOrigin = normalizeApiOrigin(process.env.API_URL);
     return [
       {
+        source: "/favicon.ico",
+        destination: "/favicon.svg"
+      },
+      {
         source: "/graphql",
         destination: `${apiOrigin}/graphql`
       },
