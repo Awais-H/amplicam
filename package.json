@@ -1,0 +1,10 @@
+{
+  "name": "accounting-system",
+  "private": true,
+  "description": "Railway/Railpack entry: installs and builds apps/web from repo root when service root is not set",
+  "scripts": {
+    "postinstall": "npm install --prefix apps/web",
+    "build": "npm run build --prefix apps/web",
+    "start": "npm run start --prefix apps/web"
+  }
+}
