@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/common/page-header";
 import { ReceiptReviewPanel } from "@/components/review/receipt-review-panel";
-import { accountingEntries, auditHistory, receipts } from "@/lib/data/demo";
+import { accountingEntries, receipts } from "@/lib/data/demo";
 
 export default async function ReviewReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,9 +14,9 @@ export default async function ReviewReceiptPage({ params }: { params: Promise<{ 
       <PageHeader
         eyebrow="Review Case"
         title={`Review ${receipt.merchantName ?? id}`}
-        description="Side-by-side image preview, correction form, audit trail, and draft accounting entry preview."
+        description="Side-by-side image preview, correction form, and draft accounting entry preview."
       />
-      <ReceiptReviewPanel receipt={receipt} accountingEntry={accountingEntries[receipt.id]} auditEvents={auditHistory[receipt.id] ?? []} />
+      <ReceiptReviewPanel receipt={receipt} accountingEntry={accountingEntries[receipt.id]} />
     </div>
   );
 }

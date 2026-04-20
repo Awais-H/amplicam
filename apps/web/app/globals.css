@@ -3,38 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --background: 40 29% 96%;
-  --foreground: 216 38% 14%;
+  --background: 210 45% 97%;
+  --foreground: 222 47% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 216 38% 14%;
-  --muted: 35 32% 92%;
-  --muted-foreground: 218 13% 40%;
-  --border: 32 21% 82%;
-  --input: 32 21% 82%;
-  --primary: 202 74% 29%;
-  --primary-foreground: 36 60% 97%;
-  --accent: 38 46% 89%;
-  --accent-foreground: 216 38% 14%;
+  --card-foreground: 222 47% 11%;
+  --muted: 210 40% 94%;
+  --muted-foreground: 215 16% 40%;
+  --border: 214 32% 88%;
+  --input: 214 32% 88%;
+  --primary: 222 47% 11%;
+  --primary-foreground: 210 40% 98%;
+  --accent: 210 40% 93%;
+  --accent-foreground: 222 47% 11%;
   --warning: 28 89% 54%;
   --warning-foreground: 24 29% 14%;
-  --success: 146 45% 36%;
+  --success: 152 45% 36%;
   --success-foreground: 144 47% 97%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+.dark {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 9%;
+  --card-foreground: 210 40% 98%;
+  --muted: 217 33% 14%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222 47% 11%;
+  --accent: 217 33% 14%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62% 45%;
+  --destructive-foreground: 0 0% 100%;
 }
 
 * {
   @apply border-border;
 }
 
+html {
+  @apply h-full;
+}
+
 body {
-  @apply bg-background text-foreground antialiased;
-  background-image:
-    radial-gradient(circle at top left, rgba(251, 191, 36, 0.18), transparent 30%),
-    radial-gradient(circle at top right, rgba(14, 116, 144, 0.14), transparent 32%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(245, 240, 232, 0.96));
+  @apply min-h-full bg-background text-foreground antialiased;
 }
 
 a {
   color: inherit;
   text-decoration: none;
 }
-

@@ -17,7 +17,8 @@ export type ReviewReasonCode =
   | "PARTIAL_RECEIPT"
   | "LOW_CATEGORY_CONFIDENCE"
   | "POLICY_BLOCKED"
-  | "PROCESSING_FAILED";
+  | "PROCESSING_FAILED"
+  | "EXTRACTION_ATTEMPT_FAILED";
 
 export interface MoneyValue {
   amount: string;

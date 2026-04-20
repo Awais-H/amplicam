@@ -11,7 +11,7 @@ const badgeVariants = cva(
         default: "bg-accent text-accentForeground",
         success: "bg-success text-successForeground",
         warning: "bg-warning text-warningForeground",
-        outline: "border border-border text-mutedForeground"
+        outline: "border border-white/55 text-neutral-600 dark:border-white/15 dark:text-neutral-400"
       }
     },
     defaultVariants: {

@@ -22,6 +22,8 @@ const config: Config = {
         primaryForeground: "hsl(var(--primary-foreground))",
         accent: "hsl(var(--accent))",
         accentForeground: "hsl(var(--accent-foreground))",
+        destructive: "hsl(var(--destructive))",
+        destructiveForeground: "hsl(var(--destructive-foreground))",
         warning: "hsl(var(--warning))",
         warningForeground: "hsl(var(--warning-foreground))",
         success: "hsl(var(--success))",
@@ -32,11 +34,22 @@ const config: Config = {
         "2xl": "1.5rem"
       },
       boxShadow: {
-        panel: "0 20px 40px -24px rgba(15, 23, 42, 0.35)"
+        panel: "0 20px 56px -20px rgba(15, 23, 42, 0.12)",
+        glass: "0 24px 80px -12px rgba(15, 23, 42, 0.16)"
       },
       fontFamily: {
-        sans: ["Aptos", "Trebuchet MS", "Segoe UI", "sans-serif"],
-        mono: ["IBM Plex Mono", "Consolas", "monospace"]
+        sans: [
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "Roboto",
+          '"Helvetica Neue"',
+          "Arial",
+          "sans-serif"
+        ],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
       }
     }
   },
@@ -44,4 +57,3 @@ const config: Config = {
 };
 
 export default config;
-

@@ -3,18 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { AccountingEntry, AuditEvent, Receipt } from "@/lib/types/entities";
+import type { AccountingEntry, Receipt } from "@/lib/types/entities";
+
+function reviewReasonsSummary(reasons: string[]): string {
+  const upper = reasons.map((r) => r.toUpperCase());
+  if (upper.includes("EXTRACTION_ATTEMPT_FAILED")) {
+    return "A later automatic parse attempt failed. The values below are still from your last successful extraction — edit as needed or use Retry extraction.";
+  }
+  return reasons.join(", ").replaceAll("_", " ");
+}
 
 export function ReceiptReviewPanel({
   receipt,
-  accountingEntry,
-  auditEvents
+  accountingEntry
 }: {
   receipt: Receipt;
   accountingEntry?: AccountingEntry;
-  auditEvents: AuditEvent[];
 }) {
   return (
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
@@ -23,11 +28,11 @@ export function ReceiptReviewPanel({
           <CardTitle>Receipt Image</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex min-h-[520px] items-center justify-center rounded-[24px] border border-dashed border-border bg-[radial-gradient(circle_at_top,_rgba(167,139,250,0.08),_transparent_35%),linear-gradient(135deg,rgba(15,23,42,0.04),rgba(234,179,8,0.12))] p-10">
-            <div className="max-w-sm rounded-2xl bg-background/90 p-6 text-center shadow-panel">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-mutedForeground">Preview</p>
-              <p className="mt-4 text-lg font-semibold">{receipt.merchantName ?? "Awaiting extraction"}</p>
-              <p className="mt-2 text-sm text-mutedForeground">
+          <div className="flex min-h-[520px] items-center justify-center rounded-[24px] border border-dashed border-white/55 bg-white/35 p-10 dark:border-white/12 dark:bg-white/5">
+            <div className="max-w-sm rounded-2xl border border-white/50 bg-white/80 p-6 text-center shadow-panel backdrop-blur-sm dark:border-white/10 dark:bg-slate-900/70">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">Preview</p>
+              <p className="mt-4 text-lg font-bold text-neutral-900 dark:text-white">{receipt.merchantName ?? "Awaiting extraction"}</p>
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 Private file rendering will use signed Active Storage URLs once connected to the GraphQL receipt query.
               </p>
             </div>
@@ -39,14 +44,13 @@ export function ReceiptReviewPanel({
         {receipt.reviewReasons.length > 0 ? (
           <Alert>
             <p className="font-semibold">Review required</p>
-            <p className="mt-2 text-sm text-mutedForeground">{receipt.reviewReasons.join(", ").replaceAll("_", " ")}</p>
+            <p className="mt-2 text-sm text-mutedForeground">{reviewReasonsSummary(receipt.reviewReasons)}</p>
           </Alert>
         ) : null}
 
         <Tabs>
           <TabsList>
             <TabsTrigger>Overview</TabsTrigger>
-            <TabsTrigger>Audit</TabsTrigger>
             <TabsTrigger>Entry</TabsTrigger>
           </TabsList>
 
@@ -59,12 +63,22 @@ export function ReceiptReviewPanel({
               <Input defaultValue={receipt.tip?.amount ?? ""} placeholder="Tip" />
               <Input defaultValue={receipt.total?.amount ?? ""} placeholder="Total" />
             </div>
-            <Select defaultValue={receipt.categoryCode ?? "uncategorized_review_required"}>
+            <Select
+              value={receipt.categoryCode ?? "uncategorized_review_required"}
+              onChange={() => {}}
+              title="Category is assigned automatically when the receipt is processed; it refreshes here as data loads."
+            >
               <option value="meals_and_entertainment">Meals & entertainment</option>
               <option value="travel_transportation">Travel & transportation</option>
-              <option value="office_supplies">Office supplies</option>
               <option value="lodging">Lodging</option>
+              <option value="office_supplies">Office supplies</option>
+              <option value="software_subscriptions">Software & subscriptions</option>
+              <option value="telecom_internet">Telecom & internet</option>
               <option value="fuel">Fuel</option>
+              <option value="parking_and_tolls">Parking & tolls</option>
+              <option value="shipping_and_courier">Shipping & courier</option>
+              <option value="professional_services">Professional services</option>
+              <option value="miscellaneous_expense">Miscellaneous</option>
               <option value="uncategorized_review_required">Uncategorized / review</option>
             </Select>
             <div className="flex flex-wrap gap-3">
@@ -73,22 +87,6 @@ export function ReceiptReviewPanel({
               <Button variant="secondary">Mark Duplicate</Button>
               <Button variant="destructive">Reject</Button>
             </div>
-          </TabsContent>
-
-          <TabsContent className="space-y-4">
-            {auditEvents.map((event) => (
-              <div key={event.id} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold">{event.eventType}</p>
-                  <p className="text-xs uppercase tracking-[0.16em] text-mutedForeground">{event.actionSource}</p>
-                </div>
-                <p className="text-sm text-mutedForeground">{new Date(event.createdAt).toLocaleString()}</p>
-                <pre className="overflow-x-auto rounded-xl bg-accent/50 p-3 text-xs text-foreground">
-                  {JSON.stringify(event.after, null, 2)}
-                </pre>
-                <Separator />
-              </div>
-            ))}
           </TabsContent>
 
           <TabsContent className="space-y-4">
