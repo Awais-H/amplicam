@@ -33,7 +33,7 @@ module Ai
       parsed = JSON.parse(text)
 
       {
-        model_name: model,
+        extraction_model: model,
         raw_model_output: body,
         parsed_fields: parsed,
         reasoning_summary: parsed["reasoning_summary"],

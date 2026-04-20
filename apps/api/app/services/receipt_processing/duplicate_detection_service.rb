@@ -28,7 +28,7 @@ module ReceiptProcessing
         merchant_total_date_fingerprint: fuzzy_key,
         matched_receipt: exact_match || fuzzy_match,
         match_score: exact_match ? 1.0 : (fuzzy_match ? 0.92 : 0.0),
-        match_type: exact_match ? :exact : (fuzzy_match ? :fuzzy : :none)
+        match_type: exact_match ? :exact : (fuzzy_match ? :fuzzy : :no_match)
       )
 
       Audit::AuditLogService.record!(

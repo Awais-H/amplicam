@@ -30,7 +30,7 @@ module ReceiptProcessing
       score += category_decision.confidence_score.to_f >= 0.8 ? 0.15 : 0.05
       reasons << "low_category_confidence" if category_decision.confidence_score.to_f < 0.8
 
-      duplicate_ok = duplicate_fingerprint.match_type == "none"
+      duplicate_ok = duplicate_fingerprint.no_match?
       score += duplicate_ok ? 0.10 : 0.0
       reasons << "duplicate_suspected" unless duplicate_ok
 

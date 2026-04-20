@@ -1,9 +1,17 @@
 module ReceiptProcessing
   class ReceiptExtractionService
-    def initialize(receipt:, processing_run:, client: Ai::GeminiClient.new)
+    def self.default_client
+      if Rails.env.development? && ENV["GEMINI_API_KEY"].to_s.blank? && ENV["DISABLE_STUB_AI"] != "1"
+        Ai::StubGeminiClient.new
+      else
+        Ai::GeminiClient.new
+      end
+    end
+
+    def initialize(receipt:, processing_run:, client: nil)
       @receipt = receipt
       @processing_run = processing_run
-      @client = client
+      @client = client || self.class.default_client
     end
 
     def call
@@ -17,7 +25,7 @@ module ReceiptProcessing
 
       extraction = receipt.receipt_extractions.create!(
         processing_run:,
-        model_name: result[:model_name],
+        extraction_model: result[:extraction_model],
         prompt_version: Ai::ReceiptExtractionPrompt::VERSION,
         raw_model_output: result[:raw_model_output],
         parsed_fields: result[:parsed_fields],
@@ -34,7 +42,7 @@ module ReceiptProcessing
         auditable: receipt,
         after: {
           extraction_id: extraction.id,
-          model_name: extraction.model_name,
+          extraction_model: extraction.extraction_model,
           prompt_version: extraction.prompt_version
         },
         action_source: "model"

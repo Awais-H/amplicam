@@ -9,6 +9,7 @@ module Types
     value "LOW_CATEGORY_CONFIDENCE", value: "low_category_confidence"
     value "POLICY_BLOCKED", value: "policy_blocked"
     value "PROCESSING_FAILED", value: "processing_failed"
+    value "EXTRACTION_ATTEMPT_FAILED", value: "extraction_attempt_failed"
   end
 end
 

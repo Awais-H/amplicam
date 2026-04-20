@@ -1,6 +1,14 @@
 class GraphqlController < ApplicationController
   before_action :authenticate_user!
 
+  # In development, allow GraphQL without a Bearer JWT or session (seeded demo user).
+  # Set DISABLE_GRAPHQL_DEV_AUTH=1 to require Authorization: Bearer <jwt> or a session cookie.
+  def current_user
+    return super unless graphql_dev_auth_fallback?
+
+    @current_user ||= super || User.find_by(email: "demo@example.com")
+  end
+
   def execute
     result = BookkeeperAgentSchema.execute(
       params[:query],
@@ -19,6 +27,10 @@ class GraphqlController < ApplicationController
   end
 
   private
+
+  def graphql_dev_auth_fallback?
+    Rails.env.development? && ENV["DISABLE_GRAPHQL_DEV_AUTH"] != "1"
+  end
 
   def ensure_hash(ambiguous_param)
     case ambiguous_param

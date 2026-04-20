@@ -48,8 +48,15 @@ module ReceiptProcessing
         error_message: error.message,
         finished_at: Time.current
       )
-      Review::ReviewQueueService.new(receipt:).enqueue!(reason_codes: ["processing_failed"])
-      receipt.update!(status: :failed)
+      receipt.reload
+      # A retry can roll back this run while an earlier normalization still exists on the receipt.
+      # Do not mark the receipt `failed` in that case, or the UI shows "processing failed" beside good data.
+      if receipt.current_normalization.present?
+        Review::ReviewQueueService.new(receipt:).enqueue!(reason_codes: ["extraction_attempt_failed"])
+      else
+        Review::ReviewQueueService.new(receipt:).enqueue!(reason_codes: ["processing_failed"])
+        receipt.update!(status: :failed)
+      end
       raise
     end
 

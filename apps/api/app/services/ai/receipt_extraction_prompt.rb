@@ -1,6 +1,6 @@
 module Ai
   class ReceiptExtractionPrompt
-    VERSION = "2026-04-19.v1".freeze
+    VERSION = "2026-04-20.v1".freeze
     SYSTEM_PROMPT = <<~PROMPT.freeze
       You are ReceiptExtractionAgent for a bookkeeping system.
       Extract only information that is visible in the receipt image or pages provided.
@@ -10,6 +10,10 @@ module Ai
       Distinguish voluntary tip from mandatory service charge.
       Mark ambiguity flags when totals do not reconcile or when handwritten values appear.
       Provide short evidence references and a brief reasoning summary, but do not include chain-of-thought.
+      When the receipt clearly implies an expense type, set category_candidate to one of:
+      meals_and_entertainment, travel_transportation, lodging, office_supplies, software_subscriptions,
+      telecom_internet, fuel, parking_and_tolls, shipping_and_courier, professional_services,
+      miscellaneous_expense — otherwise null.
     PROMPT
 
     def self.build(organization:)

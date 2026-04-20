@@ -29,6 +29,7 @@ module Accounting
         build_lines!(entry)
 
         receipt.update!(status: :posted)
+        Review::ReviewQueueService.new(receipt:).resolve!(actor:) if receipt.review_queue_item.present?
         Audit::AuditLogService.record!(
           event_type: "accounting_entry.posted",
           organization: receipt.organization,
@@ -70,7 +71,7 @@ module Accounting
         category_decision_id: category_decision.id,
         actor_id: actor&.id,
         prompt_version: receipt.current_extraction&.prompt_version,
-        model_name: receipt.current_extraction&.model_name
+        extraction_model: receipt.current_extraction&.extraction_model
       }
     end
   end
