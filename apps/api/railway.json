@@ -6,7 +6,6 @@
   },
   "deploy": {
     "preDeployCommand": "bundle exec rake db:migrate",
-    "healthcheckPath": "/health",
-    "startCommand": "bash -lc 'bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}'"
+    "healthcheckPath": "/health"
   }
 }
