@@ -18,6 +18,8 @@ module BookkeeperAgentApi
     config.time_zone = "UTC"
     config.active_job.queue_adapter = :solid_queue
     config.active_record.schema_format = :ruby
+    config.hosts << "healthcheck.railway.app"
+    config.hosts << ENV["RAILWAY_PUBLIC_DOMAIN"] if ENV["RAILWAY_PUBLIC_DOMAIN"].present?
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
       g.test_framework :rspec, fixture: false
@@ -33,4 +35,3 @@ module BookkeeperAgentApi
       httponly: true
   end
 end
-
