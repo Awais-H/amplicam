@@ -9,9 +9,6 @@ gem "rack-cors", "~> 2.0"
 gem "graphql", "~> 2.3"
 gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 2.8"
-gem "omniauth", "~> 2.1"
-gem "omniauth-google-oauth2", "~> 1.1"
-gem "omniauth_openid_connect", "~> 0.8"
 gem "pundit", "~> 2.3"
 gem "faraday", "~> 2.11"
 gem "json_schemer", "~> 2.2"
@@ -32,4 +29,3 @@ group :development, :test do
   gem "rubocop", require: false
   gem "rubocop-rails-omakase", require: false
 end
-

@@ -15,18 +15,23 @@ function normalizeApiOrigin(raw) {
   return s.replace(/\/+$/, "");
 }
 
+function configuredApiOrigin() {
+  return process.env.API_URL?.trim() || process.env.NEXT_PUBLIC_API_URL?.trim() || "";
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: monorepoRoot,
   async rewrites() {
-    if (process.env.NODE_ENV === "production" && !process.env.API_URL?.trim()) {
+    const configuredOrigin = configuredApiOrigin();
+    if (process.env.NODE_ENV === "production" && !configuredOrigin) {
       throw new Error(
-        "API_URL is unset. Production cannot proxy /graphql or /auth/* without your Rails API origin. " +
-          "Add API_URL (e.g. https://your-service.up.railway.app) and redeploy."
+        "API_URL or NEXT_PUBLIC_API_URL is unset. Production cannot proxy /graphql or /auth/* without your Rails API origin. " +
+          "Add one of them (e.g. https://your-service.up.railway.app) and redeploy."
       );
     }
-    const apiOrigin = normalizeApiOrigin(process.env.API_URL);
+    const apiOrigin = normalizeApiOrigin(configuredOrigin);
     return [
       {
         source: "/favicon.ico",

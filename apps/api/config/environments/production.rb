@@ -1,7 +1,7 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
-  required_env = %w[DATABASE_URL SECRET_KEY_BASE FRONTEND_URL APP_HOST]
+  required_env = %w[DATABASE_URL SECRET_KEY_BASE]
   missing = required_env.select { |name| ENV[name].to_s.strip.empty? }
   if missing.any?
     raise "Missing required production environment variables: #{missing.join(', ')}"
