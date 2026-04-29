@@ -172,20 +172,10 @@ export function ReceiptReviewPanel({
               <Button variant="secondary" onClick={handleRetry} disabled={isBusy}>
                 {actionState === "retry" ? "Retrying…" : "Retry Extraction"}
               </Button>
-              <Button
-                variant="secondary"
-                disabled
-                title="Mark Duplicate needs a target receipt selection before it can be completed safely."
-              >
-                Mark Duplicate
-              </Button>
               <Button variant="destructive" onClick={handleReject} disabled={isBusy}>
                 {actionState === "reject" ? "Rejecting…" : "Reject"}
               </Button>
             </div>
-            <p className="text-xs text-mutedForeground">
-              Duplicate marking is disabled until the review panel can choose which existing receipt this one duplicates.
-            </p>
           </TabsContent>
 
           <TabsContent className="space-y-4">
