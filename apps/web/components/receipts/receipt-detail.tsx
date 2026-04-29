@@ -31,7 +31,7 @@ export function ReceiptDetail({ id }: { id: string }) {
       <PageHeader
         eyebrow="Receipt Detail"
         title={receipt.merchantName ?? "Receipt pending extraction"}
-        description="Review extracted values and decide whether to approve, edit, retry, reject, or mark as duplicate."
+        description="Review extracted values and decide whether to approve, edit, retry, or reject."
       />
       <ReceiptReviewPanel receipt={receipt} accountingEntry={accountingEntry ?? undefined} />
     </div>

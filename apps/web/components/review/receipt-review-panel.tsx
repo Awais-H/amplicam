@@ -140,12 +140,30 @@ export function ReceiptReviewPanel({
 
           <TabsContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
-              <Input defaultValue={receipt.merchantName ?? ""} placeholder="Merchant name" />
-              <Input defaultValue={receipt.receiptDate ?? ""} placeholder="Receipt date" />
-              <Input defaultValue={receipt.subtotal?.amount ?? ""} placeholder="Subtotal" />
-              <Input defaultValue={receipt.tax?.amount ?? ""} placeholder="Tax" />
-              <Input defaultValue={receipt.tip?.amount ?? ""} placeholder="Tip" />
-              <Input defaultValue={receipt.total?.amount ?? ""} placeholder="Total" />
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Merchant name</p>
+                <Input defaultValue={receipt.merchantName ?? ""} />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Receipt date</p>
+                <Input defaultValue={receipt.receiptDate ?? ""} />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Subtotal</p>
+                <Input defaultValue={receipt.subtotal?.amount ?? ""} />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Tax</p>
+                <Input defaultValue={receipt.tax?.amount ?? ""} />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Tip</p>
+                <Input defaultValue={receipt.tip?.amount ?? ""} />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-mutedForeground">Total</p>
+                <Input defaultValue={receipt.total?.amount ?? ""} />
+              </div>
             </div>
             <Select
               value={receipt.categoryCode ?? "uncategorized_review_required"}
@@ -165,7 +183,7 @@ export function ReceiptReviewPanel({
               <option value="miscellaneous_expense">Miscellaneous</option>
               <option value="uncategorized_review_required">Uncategorized / review</option>
             </Select>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-nowrap items-center gap-3">
               <Button onClick={handleApprove} disabled={isBusy}>
                 {actionState === "approve" ? "Approving…" : "Approve and Post"}
               </Button>
