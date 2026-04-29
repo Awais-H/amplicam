@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bundle exec rake solid_queue:start &
+worker_pid=$!
+
+ruby bin/rails server -b 0.0.0.0 -p "${PORT:-3000}" &
+server_pid=$!
+
+cleanup() {
+  kill -TERM "$server_pid" "$worker_pid" 2>/dev/null || true
+  wait "$server_pid" 2>/dev/null || true
+  wait "$worker_pid" 2>/dev/null || true
+}
+
+trap cleanup INT TERM EXIT
+
+wait -n "$server_pid" "$worker_pid"
+status=$?
+
+cleanup
+exit $status

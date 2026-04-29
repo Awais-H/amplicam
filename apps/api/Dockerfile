@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["bash", "-lc", "ruby bin/rails server -b 0.0.0.0 -p ${PORT:-3000}"]
+CMD ["bash", "bin/start-production"]
