@@ -35,16 +35,14 @@ class ApplicationController < ActionController::API
   private
 
   def local_disk_active_storage?
-    Rails.application.config.active_storage.service == :local
+    Rails.env.development? && Rails.application.config.active_storage.service == :local
   end
 
   def set_active_storage_public_urls
-    public_url = ENV["RAILS_PUBLIC_URL"].presence || request.base_url
-    uri = URI.parse(public_url)
+    uri = URI.parse(ENV.fetch("RAILS_PUBLIC_URL", "http://localhost:3000"))
     opts = { host: uri.host, protocol: uri.scheme || "http" }
     opts[:port] = uri.port if uri.port && !((uri.scheme == "http" && uri.port == 80) || (uri.scheme == "https" && uri.port == 443))
     ActiveStorage::Current.url_options = opts
-    Rails.application.routes.default_url_options = opts
   rescue URI::InvalidURIError
     nil
   end
