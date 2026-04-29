@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/common/status-badge";
+import { fetchGraphql } from "@/lib/graphql/client";
+import { APPROVE_RECEIPT, REJECT_RECEIPT, RETRY_RECEIPT_EXTRACTION } from "@/lib/graphql/mutations";
 import type { AccountingEntry, Receipt } from "@/lib/types/entities";
+
+type ActionState = "idle" | "approve" | "retry" | "reject";
 
 function reviewReasonsSummary(reasons: string[]): string {
   const upper = reasons.map((r) => r.toUpperCase());
@@ -22,6 +30,57 @@ export function ReceiptReviewPanel({
   receipt: Receipt;
   accountingEntry?: AccountingEntry;
 }) {
+  const [actionState, setActionState] = useState<ActionState>("idle");
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  const isBusy = actionState !== "idle";
+
+  async function handleApprove() {
+    try {
+      setActionState("approve");
+      setActionError(null);
+      setActionMessage(null);
+      await fetchGraphql(APPROVE_RECEIPT, { receiptId: receipt.id, comment: "Approved from review panel" });
+      setActionMessage("Receipt approved and posted. Refreshing…");
+      window.location.reload();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to approve receipt");
+    } finally {
+      setActionState("idle");
+    }
+  }
+
+  async function handleRetry() {
+    try {
+      setActionState("retry");
+      setActionError(null);
+      setActionMessage(null);
+      await fetchGraphql(RETRY_RECEIPT_EXTRACTION, { receiptId: receipt.id, reason: "review_panel_retry" });
+      setActionMessage("Extraction retry requested. Refreshing…");
+      window.location.reload();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to retry extraction");
+    } finally {
+      setActionState("idle");
+    }
+  }
+
+  async function handleReject() {
+    try {
+      setActionState("reject");
+      setActionError(null);
+      setActionMessage(null);
+      await fetchGraphql(REJECT_RECEIPT, { receiptId: receipt.id, reason: "Rejected from review panel" });
+      setActionMessage("Receipt rejected. Refreshing…");
+      window.location.reload();
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to reject receipt");
+    } finally {
+      setActionState("idle");
+    }
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
       <Card className="overflow-hidden">
@@ -59,6 +118,20 @@ export function ReceiptReviewPanel({
           </Alert>
         ) : null}
 
+        {actionError ? (
+          <Alert>
+            <p className="font-semibold">Action failed</p>
+            <p className="mt-2 text-sm text-mutedForeground">{actionError}</p>
+          </Alert>
+        ) : null}
+
+        {actionMessage ? (
+          <Alert className="border-success/30 bg-success/10">
+            <p className="font-semibold">Update</p>
+            <p className="mt-2 text-sm text-mutedForeground">{actionMessage}</p>
+          </Alert>
+        ) : null}
+
         <Tabs>
           <TabsList>
             <TabsTrigger>Overview</TabsTrigger>
@@ -93,11 +166,26 @@ export function ReceiptReviewPanel({
               <option value="uncategorized_review_required">Uncategorized / review</option>
             </Select>
             <div className="flex flex-wrap gap-3">
-              <Button>Approve and Post</Button>
-              <Button variant="secondary">Retry Extraction</Button>
-              <Button variant="secondary">Mark Duplicate</Button>
-              <Button variant="destructive">Reject</Button>
+              <Button onClick={handleApprove} disabled={isBusy}>
+                {actionState === "approve" ? "Approving…" : "Approve and Post"}
+              </Button>
+              <Button variant="secondary" onClick={handleRetry} disabled={isBusy}>
+                {actionState === "retry" ? "Retrying…" : "Retry Extraction"}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled
+                title="Mark Duplicate needs a target receipt selection before it can be completed safely."
+              >
+                Mark Duplicate
+              </Button>
+              <Button variant="destructive" onClick={handleReject} disabled={isBusy}>
+                {actionState === "reject" ? "Rejecting…" : "Reject"}
+              </Button>
             </div>
+            <p className="text-xs text-mutedForeground">
+              Duplicate marking is disabled until the review panel can choose which existing receipt this one duplicates.
+            </p>
           </TabsContent>
 
           <TabsContent className="space-y-4">

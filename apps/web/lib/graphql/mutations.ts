@@ -31,3 +31,39 @@ export const CREATE_RECEIPT = `
     }
   }
 `;
+
+export const APPROVE_RECEIPT = `
+  mutation ApproveReceipt($receiptId: ID!, $comment: String) {
+    approveReceipt(input: { receiptId: $receiptId, comment: $comment }) {
+      receipt {
+        id
+        status
+      }
+      accountingEntry {
+        id
+      }
+    }
+  }
+`;
+
+export const RETRY_RECEIPT_EXTRACTION = `
+  mutation RetryReceiptExtraction($receiptId: ID!, $reason: String) {
+    retryReceiptExtraction(input: { receiptId: $receiptId, reason: $reason }) {
+      receipt {
+        id
+        status
+      }
+    }
+  }
+`;
+
+export const REJECT_RECEIPT = `
+  mutation RejectReceipt($receiptId: ID!, $reason: String!) {
+    rejectReceipt(input: { receiptId: $receiptId, reason: $reason }) {
+      receipt {
+        id
+        status
+      }
+    }
+  }
+`;
