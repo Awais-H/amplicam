@@ -41,6 +41,15 @@ export interface Receipt {
   needsHumanReview: boolean;
   reviewReasons: ReviewReasonCode[];
   sourceFileUrl: string | null;
+  processingRun?: {
+    id: string;
+    runKind: string;
+    status: string;
+    errorClass: string | null;
+    errorMessage: string | null;
+    startedAt: string | null;
+    finishedAt: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -84,4 +93,3 @@ export interface AuditEvent {
   after: Record<string, unknown>;
   createdAt: string;
 }
-

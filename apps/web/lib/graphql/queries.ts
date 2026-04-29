@@ -17,6 +17,15 @@ export const RECEIPTS_QUERY = `
         needsHumanReview
         reviewReasons
         sourceFileUrl
+        processingRun {
+          id
+          runKind
+          status
+          errorClass
+          errorMessage
+          startedAt
+          finishedAt
+        }
         createdAt
         updatedAt
       }
@@ -46,6 +55,15 @@ export const RECEIPT_QUERY = `
       needsHumanReview
       reviewReasons
       sourceFileUrl
+      processingRun {
+        id
+        runKind
+        status
+        errorClass
+        errorMessage
+        startedAt
+        finishedAt
+      }
       createdAt
       updatedAt
     }

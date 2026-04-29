@@ -11,7 +11,7 @@ interface ReceiptResponse {
   accountingEntry: AccountingEntry | null;
 }
 
-const SETTLED_STATUSES = new Set(["POSTED", "REJECTED", "DUPLICATE"]);
+const SETTLED_STATUSES = new Set(["NEEDS_REVIEW", "APPROVED", "POSTED", "DUPLICATE", "REJECTED", "FAILED"]);
 
 export function useReceipt(id: string) {
   const [receipt, setReceipt] = useState<Receipt | null>(null);

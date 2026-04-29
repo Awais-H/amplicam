@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StatusBadge } from "@/components/common/status-badge";
 import type { AccountingEntry, Receipt } from "@/lib/types/entities";
 
 function reviewReasonsSummary(reasons: string[]): string {
@@ -25,7 +26,10 @@ export function ReceiptReviewPanel({
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
       <Card className="overflow-hidden">
         <CardHeader>
-          <CardTitle>Receipt Image</CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle>Receipt Image</CardTitle>
+            <StatusBadge status={receipt.status} />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex min-h-[520px] items-center justify-center rounded-[24px] border border-dashed border-white/55 bg-white/35 p-10 dark:border-white/12 dark:bg-white/5">
@@ -45,6 +49,13 @@ export function ReceiptReviewPanel({
           <Alert>
             <p className="font-semibold">Review required</p>
             <p className="mt-2 text-sm text-mutedForeground">{reviewReasonsSummary(receipt.reviewReasons)}</p>
+          </Alert>
+        ) : null}
+
+        {receipt.processingRun?.errorMessage ? (
+          <Alert>
+            <p className="font-semibold">Processing error</p>
+            <p className="mt-2 text-sm text-mutedForeground">{receipt.processingRun.errorMessage}</p>
           </Alert>
         ) : null}
 
@@ -121,4 +132,3 @@ export function ReceiptReviewPanel({
     </div>
   );
 }
-
