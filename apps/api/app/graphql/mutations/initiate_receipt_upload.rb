@@ -1,3 +1,5 @@
+require "uri"
+
 module Mutations
   class InitiateReceiptUpload < Types::BaseMutation
     argument :filename, String, required: true
@@ -20,10 +22,20 @@ module Mutations
 
       {
         blob_signed_id: blob.signed_id,
-        upload_url: blob.service_url_for_direct_upload,
+        upload_url: normalized_upload_url(blob.service_url_for_direct_upload),
         headers: blob.service_headers_for_direct_upload
       }
     end
+
+    private
+
+    def normalized_upload_url(url)
+      return url unless Rails.application.config.active_storage.service == :local
+
+      uri = URI.parse(url)
+      [uri.path.presence, uri.query.presence && "?#{uri.query}"].compact.join
+    rescue URI::InvalidURIError
+      url
+    end
   end
 end
-

@@ -42,6 +42,14 @@ const nextConfig = {
         destination: `${apiOrigin}/graphql`
       },
       {
+        source: "/storage/:path*",
+        destination: `${apiOrigin}/storage/:path*`
+      },
+      {
+        source: "/rails/active_storage/:path*",
+        destination: `${apiOrigin}/rails/active_storage/:path*`
+      },
+      {
         source: "/auth/:path*",
         destination: `${apiOrigin}/auth/:path*`
       }
