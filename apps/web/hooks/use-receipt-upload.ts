@@ -22,6 +22,26 @@ interface CreateResponse {
   };
 }
 
+function normalizeApiOrigin(raw?: string): string | null {
+  const value = raw?.trim();
+  if (!value) return null;
+
+  let normalized = value.replace(/\/graphql\/?$/i, "");
+  if (!/^https?:\/\//i.test(normalized)) {
+    normalized = `https://${normalized.replace(/^\/+/, "")}`;
+  }
+  return normalized.replace(/\/+$/, "");
+}
+
+function uploadTargets(uploadUrl: string): string[] {
+  if (!uploadUrl.startsWith("/")) return [uploadUrl];
+
+  const apiOrigin = normalizeApiOrigin(process.env.NEXT_PUBLIC_API_URL);
+  if (!apiOrigin) return [uploadUrl];
+
+  return [uploadUrl, `${apiOrigin}${uploadUrl}`];
+}
+
 function computeMd5Base64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunkSize = 2 * 1024 * 1024;
@@ -77,11 +97,29 @@ export function useReceiptUpload() {
 
       setStage("uploading");
       setProgress(50);
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { ...headers, "Content-Type": file.type || "application/octet-stream" },
-        body: file,
-      });
+      let uploadResponse: Response | null = null;
+      let lastError: Error | null = null;
+
+      for (const target of uploadTargets(uploadUrl)) {
+        try {
+          uploadResponse = await fetch(target, {
+            method: "PUT",
+            headers: { ...headers, "Content-Type": file.type || "application/octet-stream" },
+            body: file,
+          });
+
+          if (uploadResponse.ok) break;
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error("Direct upload failed");
+        }
+      }
+
+      if (!uploadResponse && lastError) {
+        throw lastError;
+      }
+      if (!uploadResponse) {
+        throw new Error("Direct upload failed");
+      }
 
       if (!uploadResponse.ok) {
         const detail = (await uploadResponse.text()).trim().slice(0, 200);
