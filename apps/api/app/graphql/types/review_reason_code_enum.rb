@@ -1,15 +1,26 @@
 module Types
   class ReviewReasonCodeEnum < BaseEnum
-    value "LOW_IMAGE_QUALITY", value: "low_image_quality"
-    value "UNRECONCILED_TOTALS", value: "unreconciled_totals"
-    value "HANDWRITTEN_TIP", value: "handwritten_tip"
-    value "DUPLICATE_SUSPECTED", value: "duplicate_suspected"
-    value "FOREIGN_CURRENCY", value: "foreign_currency"
-    value "PARTIAL_RECEIPT", value: "partial_receipt"
-    value "LOW_CATEGORY_CONFIDENCE", value: "low_category_confidence"
-    value "POLICY_BLOCKED", value: "policy_blocked"
-    value "PROCESSING_FAILED", value: "processing_failed"
-    value "EXTRACTION_ATTEMPT_FAILED", value: "extraction_attempt_failed"
+    MAPPING = {
+      "LOW_IMAGE_QUALITY" => "low_image_quality",
+      "UNRECONCILED_TOTALS" => "unreconciled_totals",
+      "HANDWRITTEN_TIP" => "handwritten_tip",
+      "DUPLICATE_SUSPECTED" => "duplicate_suspected",
+      "FOREIGN_CURRENCY" => "foreign_currency",
+      "PARTIAL_RECEIPT" => "partial_receipt",
+      "LOW_CATEGORY_CONFIDENCE" => "low_category_confidence",
+      "POLICY_BLOCKED" => "policy_blocked",
+      "PROCESSING_FAILED" => "processing_failed",
+      "EXTRACTION_ATTEMPT_FAILED" => "extraction_attempt_failed",
+      "MISSING_REQUIRED_FIELDS" => "missing_required_fields",
+      "REVIEW_REQUIRED" => "review_required"
+    }.freeze
+
+    MAPPING.each do |graphql_name, internal_value|
+      value graphql_name, value: internal_value
+    end
+
+    def self.allowed_values
+      MAPPING.values
+    end
   end
 end
-
