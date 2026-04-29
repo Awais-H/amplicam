@@ -64,7 +64,7 @@ module Types
     end
 
     def review_reasons
-      filter_review_reasons(Array(object.review_queue_item&.reason_codes_jsonb))
+      Array(object.review_queue_item&.reason_codes_jsonb)
     end
 
     def source_file_url
@@ -84,9 +84,6 @@ module Types
     def money(cents)
       Support::Money.payload(cents:, currency: object.current_normalization&.currency)
     end
-
-    def filter_review_reasons(reason_codes)
-      reason_codes.select { |code| Types::ReviewReasonCodeEnum.allowed_values.include?(code) }
-    end
   end
 end
+

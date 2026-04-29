@@ -10,7 +10,8 @@ module Types
     field :resolved_at, GraphQL::Types::ISO8601DateTime, null: true
 
     def reasons
-      Array(object.reason_codes_jsonb).select { |code| Types::ReviewReasonCodeEnum.allowed_values.include?(code) }
+      object.reason_codes_jsonb
     end
   end
 end
+
